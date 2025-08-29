@@ -133,13 +133,13 @@ const title = document.getElementById("title");
 
 const themes = {
   white:{header:"#333",note:"#fff",noteFg:"#000"},
-  dark:{header:"#111",note:"#222",noteFg:"#fff"},
-  blue:{header:"#1e3a8a",note:"#dbeafe"},
-  green:{header:"#065f46",note:"#d1fae5"},
-  purple:{header:"#6b21a8",note:"#ede9fe"},
-  pink:{header:"#9d174d",note:"#fce7f3"},
-  orange:{header:"#ea580c",note:"#ffedd5"},
-  yellow:{header:"#ca8a04",note:"#fef9c3"},
+  dark:{header:"#000",note:"#222",noteFg:"#fff"},
+  blue:{header:"#1e3a8a",note:"#dbeafe",noteFg:"#000"},
+  green:{header:"#065f46",note:"#d1fae5",noteFg:"#000"},
+  purple:{header:"#6b21a8",note:"#ede9fe",noteFg:"#000"},
+  pink:{header:"#9d174d",note:"#fce7f3",noteFg:"#000"},
+  orange:{header:"#ea580c",note:"#ffedd5",noteFg:"#000"},
+  yellow:{header:"#ca8a04",note:"#fef9c3",noteFg:"#000"},
 };
 
 function contrast(hex){
@@ -152,9 +152,8 @@ function setTheme(name){
   const t=themes[name]; if(!t) return;
   document.documentElement.style.setProperty("--header-bg",t.header);
   document.documentElement.style.setProperty("--note-bg",t.note);
-  document.documentElement.style.setProperty("--note-fg",t.noteFg||contrast(t.note));
+  document.documentElement.style.setProperty("--note-fg",t.noteFg);
   document.documentElement.style.setProperty("--header-fg",contrast(t.header));
-  if(name==="dark"){ title.style.color="#fff"; } else { title.style.color=""; }
   localStorage.setItem(LS.theme,name);
   document.querySelectorAll(".theme-btn").forEach(btn=>{
     btn.classList.toggle("active",btn.dataset.theme===name);
@@ -175,7 +174,7 @@ function changeSize(d){
 }
 function saveNote(){ localStorage.setItem(LS.note,note.value); alert("Note saved!"); }
 function exportFile(type){
-  let content=note.value, blob, ext, mime;
+  let content=note.value, blob, ext;
   if(type==="txt"){blob=new Blob([content],{type:"text/plain"}); ext="txt";}
   else if(type==="html"){blob=new Blob([`<pre>${content}</pre>`],{type:"text/html"}); ext="html";}
   else if(type==="pdf"){window.print(); return;}
