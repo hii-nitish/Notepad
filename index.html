@@ -1,199 +1,192 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Notepad</title>
-<style>
-  body {
-    margin: 0;
-    font-family: sans-serif;
-    background: var(--note-bg, #fff);
-    color: var(--note-fg, #000);
-  }
-  header {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 10px;
-    background: var(--header-bg, #333);
-    color: var(--header-fg, #fff);
-    font-weight: bold;
-    z-index: 10;
-  }
-  #menuBtn {
-    background: none;
-    border: none;
-    font-size: 20px;
-    color: inherit;
-    cursor: pointer;
-  }
-  #menu {
-    position: absolute;
-    top: 40px;
-    right: 10px;
-    background: #fff;
-    color: #000;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    display: none;
-    flex-direction: column;
-    padding: 10px;
-    min-width: 200px;
-    font-size: 14px;
-  }
-  #menu.show { display: flex; }
-  #menu h4 {
-    margin: 8px 0 4px;
-    font-size: 13px;
-    font-weight: bold;
-    color: #555;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 2px;
-  }
-  .theme-row {
-    display: flex;
-    gap: 6px;
-    margin: 5px 0;
-  }
-  .theme-btn {
-    width: 22px; height: 22px;
-    border-radius: 50%;
-    border: 2px solid #666;
-    cursor: pointer;
-  }
-  .theme-btn.active {
-    border: 2px solid #000;
-    box-shadow: 0 0 0 2px #fff inset;
-  }
-  #note {
-    margin-top: 40px;
-    width: 100%;
-    height: calc(100vh - 40px);
-    border: none;
-    padding: 10px;
-    resize: none;
-    font-size: var(--note-size, 16px);
-    font-family: var(--note-font, sans-serif);
-    background: var(--note-bg, #fff);
-    color: var(--note-fg, #000);
-    outline: none;
-  }
-  button.small { font-size: 13px; margin: 2px; }
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Minimal Notepad</title>
+  <style>
+    :root {
+      --header-bg: #333;
+      --header-fg: #fff;
+      --note-bg: #ffffff;
+      --note-fg: #111111;
+      --note-font: system-ui, sans-serif;
+      --note-size: 18px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body { font-family: var(--note-font); }
+
+    header {
+      position: fixed; top: 0; left: 0; right: 0; height: 44px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 12px; background: var(--header-bg);
+      color: var(--header-fg);
+      font-size: 14px; font-weight: 600;
+      z-index: 10;
+    }
+
+    #menuBtn {
+      background: none; border: none; font-size: 18px;
+      cursor: pointer; color: inherit;
+    }
+
+    #menu {
+      position: absolute; top: 44px; right: 12px;
+      background: #fff; border: 1px solid #ddd; border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,.15);
+      padding: 8px; display: none;
+      flex-direction: column; gap: 8px; font-size: 14px;
+      min-width: 160px;
+    }
+
+    #menu button, #menu select {
+      background: #f9f9f9; border: 1px solid #ddd;
+      border-radius: 6px; padding: 6px 10px;
+      cursor: pointer; font: inherit;
+    }
+
+    .theme-row {
+      display: flex; gap: 6px; flex-wrap: wrap;
+      padding-top: 4px;
+    }
+
+    .theme-btn {
+      width: 22px; height: 22px; border-radius: 50%; border: 2px solid #fff;
+      cursor: pointer; flex-shrink: 0;
+    }
+
+    textarea {
+      position: absolute; top: 44px; left: 0; right: 0; bottom: 0;
+      width: 100%; height: calc(100% - 44px);
+      border: none; outline: none; resize: none;
+      font: 400 var(--note-size)/1.6 var(--note-font);
+      padding: 16px;
+      background: var(--note-bg); color: var(--note-fg);
+    }
+  </style>
 </head>
 <body>
   <header>
     <div id="title">Notepad</div>
     <button id="menuBtn">⋮</button>
     <div id="menu">
-      <h4>Theme</h4>
-      <div class="theme-row">
-        <div class="theme-btn" style="background:#fff" data-theme="white" title="White Theme"></div>
-        <div class="theme-btn" style="background:#222" data-theme="dark" title="Dark Theme"></div>
-        <div class="theme-btn" style="background:#1e3a8a" data-theme="blue" title="Blue Theme"></div>
-        <div class="theme-btn" style="background:#065f46" data-theme="green" title="Green Theme"></div>
-        <div class="theme-btn" style="background:#6b21a8" data-theme="purple" title="Purple Theme"></div>
-        <div class="theme-btn" style="background:#ec4899" data-theme="pink" title="Pink Theme"></div>
-        <div class="theme-btn" style="background:#ea580c" data-theme="orange" title="Orange Theme"></div>
-        <div class="theme-btn" style="background:#eab308" data-theme="yellow" title="Yellow Theme"></div>
+      <button id="saveLocal">💾 Save</button>
+      <button id="clearNote">🗑 Clear</button>
+      <button id="saveTxt">TXT</button>
+      <button id="saveHtml">HTML</button>
+      <button id="savePdf">PDF</button>
+      <button id="saveDoc">Word</button>
+      <select id="fontFamily">
+        <option value="system-ui, sans-serif">Sans-serif</option>
+        <option value="Georgia, serif">Serif</option>
+        <option value="monospace">Monospace</option>
+      </select>
+      <div style="display:flex; gap:6px;">
+        <button id="smaller">A−</button>
+        <button id="larger">A+</button>
       </div>
-
-      <h4>Font</h4>
-      <button class="small" onclick="setFont('sans-serif')">Sans-serif</button>
-      <button class="small" onclick="setFont('serif')">Serif</button>
-      <button class="small" onclick="setFont('monospace')">Monospace</button>
-
-      <h4>Font Size</h4>
-      <button class="small" onclick="changeSize(-2)">A−</button>
-      <button class="small" onclick="changeSize(2)">A+</button>
-
-      <h4>Save & Export</h4>
-      <button class="small" onclick="saveNote()">Save Now</button>
-      <button class="small" onclick="exportFile('txt')">Export TXT</button>
-      <button class="small" onclick="exportFile('html')">Export HTML</button>
-      <button class="small" onclick="exportFile('pdf')">Export PDF</button>
-      <button class="small" onclick="exportFile('doc')">Export Word</button>
-
-      <h4>Other</h4>
-      <button class="small" onclick="clearNote()">Clear Note</button>
+      <div class="theme-row">
+        <div class="theme-btn" data-theme="white" style="background:#f9f9f9"></div>
+        <div class="theme-btn" data-theme="dark" style="background:#111"></div>
+        <div class="theme-btn" data-theme="blue" style="background:#1e3a8a"></div>
+        <div class="theme-btn" data-theme="green" style="background:#065f46"></div>
+        <div class="theme-btn" data-theme="purple" style="background:#6b21a8"></div>
+        <div class="theme-btn" data-theme="pink" style="background:#ec4899"></div>
+        <div class="theme-btn" data-theme="orange" style="background:#ea580c"></div>
+        <div class="theme-btn" data-theme="yellow" style="background:#eab308"></div>
+      </div>
     </div>
   </header>
-  <textarea id="note" placeholder="Start typing..."></textarea>
+  <textarea id="note" placeholder="Start typing…"></textarea>
 
-<script>
-const LS = { note:"np-note", theme:"np-theme", font:"np-font", size:"np-size" };
-const note = document.getElementById("note");
-const menu = document.getElementById("menu");
-const menuBtn = document.getElementById("menuBtn");
-const title = document.getElementById("title");
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script>
+    const $ = s => document.querySelector(s);
+    const note = $('#note');
+    const menuBtn = $('#menuBtn');
+    const menu = $('#menu');
+    const fontFamily = $('#fontFamily');
+    const smaller = $('#smaller');
+    const larger = $('#larger');
+    const saveLocal = $('#saveLocal');
+    const clearNote = $('#clearNote');
+    const saveTxt = $('#saveTxt');
+    const saveHtml = $('#saveHtml');
+    const savePdf = $('#savePdf');
+    const saveDoc = $('#saveDoc');
+    const title = $('#title');
 
-const themes = {
-  white:{header:"#333",note:"#fff",noteFg:"#000"},
-  dark:{header:"#000",note:"#222",noteFg:"#fff"},
-  blue:{header:"#1e3a8a",note:"#dbeafe",noteFg:"#000"},
-  green:{header:"#065f46",note:"#d1fae5",noteFg:"#000"},
-  purple:{header:"#6b21a8",note:"#ede9fe",noteFg:"#000"},
-  pink:{header:"#9d174d",note:"#fce7f3",noteFg:"#000"},
-  orange:{header:"#ea580c",note:"#ffedd5",noteFg:"#000"},
-  yellow:{header:"#ca8a04",note:"#fef9c3",noteFg:"#000"},
-};
+    const LS = {
+      content: 'np.content', theme: 'np.theme', font: 'np.font', size: 'np.size'
+    };
 
-function contrast(hex){
-  const c=parseInt(hex.replace("#",""),16);
-  const r=(c>>16)&255, g=(c>>8)&255, b=c&255;
-  return (r*0.299+g*0.587+b*0.114)>186?"#000":"#fff";
-}
+    const themes = {
+      white: {header:'#333', note:'#ffffff'},
+      dark: {header:'#111', note:'#222', forceTitle:'#fff'},
+      blue: {header:'#1e3a8a', note:'#dbeafe'},
+      green: {header:'#065f46', note:'#d1fae5'},
+      purple: {header:'#6b21a8', note:'#f3e8ff'},
+      pink: {header:'#be185d', note:'#fce7f3'},
+      orange: {header:'#c2410c', note:'#ffedd5'},
+      yellow: {header:'#ca8a04', note:'#fef9c3'}
+    };
 
-function setTheme(name){
-  const t=themes[name]; if(!t) return;
-  document.documentElement.style.setProperty("--header-bg",t.header);
-  document.documentElement.style.setProperty("--note-bg",t.note);
-  document.documentElement.style.setProperty("--note-fg",t.noteFg);
-  document.documentElement.style.setProperty("--header-fg",contrast(t.header));
-  localStorage.setItem(LS.theme,name);
-  document.querySelectorAll(".theme-btn").forEach(btn=>{
-    btn.classList.toggle("active",btn.dataset.theme===name);
-  });
-  menu.classList.remove("show");
-}
+    function setTheme(name){
+      const t=themes[name]; if(!t) return;
+      document.documentElement.style.setProperty('--header-bg',t.header);
+      document.documentElement.style.setProperty('--note-bg',t.note);
+      if(name==='dark'){title.style.color='#fff'}
+      else{document.documentElement.style.setProperty('--header-fg',contrast(t.header));title.style.color=''}
+      document.documentElement.style.setProperty('--note-fg',contrast(t.note));
+      localStorage.setItem(LS.theme,name);
+    }
 
-function setFont(f){ 
-  document.documentElement.style.setProperty("--note-font",f);
-  localStorage.setItem(LS.font,f);
-  menu.classList.remove("show");
-}
-function changeSize(d){
-  let s=parseInt(getComputedStyle(note).fontSize);
-  s=Math.max(10,s+d);
-  document.documentElement.style.setProperty("--note-size",s+"px");
-  localStorage.setItem(LS.size,s);
-}
-function saveNote(){ localStorage.setItem(LS.note,note.value); alert("Note saved!"); }
-function exportFile(type){
-  let content=note.value, blob, ext;
-  if(type==="txt"){blob=new Blob([content],{type:"text/plain"}); ext="txt";}
-  else if(type==="html"){blob=new Blob([`<pre>${content}</pre>`],{type:"text/html"}); ext="html";}
-  else if(type==="pdf"){window.print(); return;}
-  else if(type==="doc"){blob=new Blob([content],{type:"application/msword"}); ext="doc";}
-  const a=document.createElement("a");
-  a.href=URL.createObjectURL(blob);
-  a.download="note."+ext;
-  a.click();
-}
-function clearNote(){ if(confirm("Clear note?")){ note.value=""; saveNote(); } }
+    function contrast(hex){
+      const h=hex.replace('#','');
+      const r=parseInt(h.substr(0,2),16),g=parseInt(h.substr(2,2),16),b=parseInt(h.substr(4,2),16);
+      const L=[r,g,b].map(u=>{u/=255;return u<=.03928?u/12.92:Math.pow((u+.055)/1.055,2.4)});
+      return (0.2126*L[0]+0.7152*L[1]+0.0722*L[2])<0.6?'#fff':'#111';
+    }
 
-menuBtn.onclick=()=>menu.classList.toggle("show");
-window.onclick=e=>{ if(!menu.contains(e.target)&&e.target!==menuBtn) menu.classList.remove("show"); };
+    function load(){
+      note.value=localStorage.getItem(LS.content)||'';
+      const th=localStorage.getItem(LS.theme)||'white';
+      setTheme(th);
+      const f=localStorage.getItem(LS.font);if(f){fontFamily.value=f;document.documentElement.style.setProperty('--note-font',f)}
+      const s=localStorage.getItem(LS.size)||18;document.documentElement.style.setProperty('--note-size',s+'px');
+    }
 
-note.value=localStorage.getItem(LS.note)||"";
-note.oninput=()=>localStorage.setItem(LS.note,note.value);
-setFont(localStorage.getItem(LS.font)||"sans-serif");
-document.documentElement.style.setProperty("--note-size",(localStorage.getItem(LS.size)||16)+"px");
-setTheme(localStorage.getItem(LS.theme)||"white");
-</script>
+    function save(){localStorage.setItem(LS.content,note.value)}
+    function dl(name,type,data){
+      const blob=new Blob([data],{type});
+      const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();
+      setTimeout(()=>URL.revokeObjectURL(a.href),0);
+    }
+
+    saveTxt.onclick=()=>dl('note.txt','text/plain',note.value);
+    saveHtml.onclick=()=>dl('note.html','text/html',`<pre>${note.value.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))}</pre>`);
+    savePdf.onclick=()=>{const {jsPDF}=window.jspdf;const doc=new jsPDF();doc.text(note.value,10,10);doc.save('note.pdf');};
+    saveDoc.onclick=()=>dl('note.doc','application/msword',note.value);
+
+    saveLocal.onclick=()=>{save();alert('Saved')};
+    clearNote.onclick=()=>{if(confirm('Clear note?')){note.value='';save();}};
+
+    fontFamily.onchange=()=>{document.documentElement.style.setProperty('--note-font',fontFamily.value);localStorage.setItem(LS.font,fontFamily.value)};
+    smaller.onclick=()=>{let s=parseInt(getComputedStyle(document.documentElement).getPropertyValue('--note-size'));s=Math.max(10,s-2);document.documentElement.style.setProperty('--note-size',s+'px');localStorage.setItem(LS.size,s)};
+    larger.onclick=()=>{let s=parseInt(getComputedStyle(document.documentElement).getPropertyValue('--note-size'));s=Math.min(72,s+2);document.documentElement.style.setProperty('--note-size',s+'px');localStorage.setItem(LS.size,s)};
+
+    note.oninput=save;
+    menuBtn.onclick=()=>{menu.style.display=menu.style.display==='flex'?'none':'flex'};
+    document.addEventListener('click',(e)=>{if(!menu.contains(e.target)&&e.target!==menuBtn){menu.style.display='none'}});
+
+    document.querySelectorAll('.theme-btn').forEach(btn=>{
+      btn.onclick=()=>setTheme(btn.dataset.theme);
+    });
+
+    load();
+    note.focus();
+  </script>
 </body>
 </html>
