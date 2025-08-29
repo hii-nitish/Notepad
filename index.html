@@ -1,500 +1,200 @@
-<html>
-        <head><title>Downloaded HTML</title></head>
-        <body>
-            <pre style="white-space: pre-wrap; word-wrap: break-word;"><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SimpleNotePad</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Inter font for a clean, modern look -->
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
-        body {
-            font-family: 'Inter', sans-serif;
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-        }
-        #app-container {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-        }
-        #main-header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 1rem 0;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            z-index: 10;
-            transition: background-color 0.3s ease;
-        }
-        #note-area {
-            flex-grow: 1;
-            padding: 2rem;
-            padding-top: 5rem; /* Space for the header */
-            border: none;
-            outline: none;
-            resize: none;
-            font-family: 'Sans-serif';
-            line-height: 1.6;
-            transition: font-size 0.2s ease, font-family 0.2s ease;
-            color: #1a202c; /* Default dark text color */
-        }
-        #controls {
-            position: fixed;
-            top: 50%;
-            right: 0;
-            transform: translateY(-50%);
-            width: 50px;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            padding: 1rem;
-            background-color: #f7fafc;
-            border-top-left-radius: 8px;
-            border-bottom-left-radius: 8px;
-            box-shadow: -2px 0 4px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease-in-out;
-            z-index: 9;
-        }
-        #controls.hidden {
-            transform: translateY(-50%) translateX(calc(100% - 50px));
-        }
-        .control-button {
-            width: 40px;
-            height: 40px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: #cbd5e0;
-            border-radius: 50%;
-            cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            transition: background-color 0.2s ease, transform 0.2s ease;
-        }
-        .control-button:hover {
-            background-color: #a0aec0;
-            transform: scale(1.05);
-        }
-        .text-size-btn, .font-btn {
-            font-size: 1.25rem;
-            font-weight: bold;
-            line-height: 1;
-        }
-        .export-option, .note-action {
-            width: 100%;
-            padding: 0.5rem;
-            text-align: center;
-            font-size: 0.875rem;
-            background-color: #a0aec0;
-            color: white;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-        }
-        .export-option:hover, .note-action:hover {
-            background-color: #718096;
-        }
-        .hidden-options {
-            position: fixed;
-            top: 50%;
-            right: 50px;
-            transform: translateY(-50%);
-            background-color: #f7fafc;
-            padding: 1rem;
-            border-radius: 8px;
-            box-shadow: -2px 0 4px rgba(0,0,0,0.1);
-            z-index: 8;
-            transition: transform 0.3s ease-in-out;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-        .hidden-options.hidden {
-            transform: translateY(-50%) translateX(200px);
-        }
-        .font-selector {
-            width: 100%;
-            padding: 0.5rem;
-            border-radius: 8px;
-            border: 1px solid #cbd5e0;
-        }
-        #word-export-text {
-            font-size: 0.75rem;
-            color: #718096;
-            margin-top: 0.25rem;
-            text-align: center;
-        }
-    </style>
+<meta charset="UTF-8">
+<title>Notepad</title>
+<style>
+  body {
+    margin: 0;
+    font-family: sans-serif;
+    background: var(--note-bg, #fff);
+    color: var(--note-fg, #000);
+  }
+  header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 10px;
+    background: var(--header-bg, #333);
+    color: var(--header-fg, #fff);
+    font-weight: bold;
+    z-index: 10;
+  }
+  #menuBtn {
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: inherit;
+    cursor: pointer;
+  }
+  #menu {
+    position: absolute;
+    top: 40px;
+    right: 10px;
+    background: #fff;
+    color: #000;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    display: none;
+    flex-direction: column;
+    padding: 10px;
+    min-width: 200px;
+    font-size: 14px;
+  }
+  #menu.show { display: flex; }
+  #menu h4 {
+    margin: 8px 0 4px;
+    font-size: 13px;
+    font-weight: bold;
+    color: #555;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 2px;
+  }
+  .theme-row {
+    display: flex;
+    gap: 6px;
+    margin: 5px 0;
+  }
+  .theme-btn {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: 2px solid #666;
+    cursor: pointer;
+  }
+  .theme-btn.active {
+    border: 2px solid #000;
+    box-shadow: 0 0 0 2px #fff inset;
+  }
+  #note {
+    margin-top: 40px;
+    width: 100%;
+    height: calc(100vh - 40px);
+    border: none;
+    padding: 10px;
+    resize: none;
+    font-size: var(--note-size, 16px);
+    font-family: var(--note-font, sans-serif);
+    background: var(--note-bg, #fff);
+    color: var(--note-fg, #000);
+    outline: none;
+  }
+  button.small { font-size: 13px; margin: 2px; }
+</style>
 </head>
 <body>
-    <div id="app-container">
-        <!-- Main Header -->
-        <header id="main-header" class="text-white">
-            <h1 class="text-xl font-bold">SimpleNotePad</h1>
-            <input type="color" id="color-picker" class="ml-4 rounded-full border-2 border-white cursor-pointer" value="#4A90E2">
-        </header>
+  <header>
+    <div id="title">Notepad</div>
+    <button id="menuBtn">⋮</button>
+    <div id="menu">
+      <h4>Theme</h4>
+      <div class="theme-row">
+        <div class="theme-btn" style="background:#fff" data-theme="white" title="White Theme"></div>
+        <div class="theme-btn" style="background:#222" data-theme="dark" title="Dark Theme"></div>
+        <div class="theme-btn" style="background:#1e3a8a" data-theme="blue" title="Blue Theme"></div>
+        <div class="theme-btn" style="background:#065f46" data-theme="green" title="Green Theme"></div>
+        <div class="theme-btn" style="background:#6b21a8" data-theme="purple" title="Purple Theme"></div>
+        <div class="theme-btn" style="background:#ec4899" data-theme="pink" title="Pink Theme"></div>
+        <div class="theme-btn" style="background:#ea580c" data-theme="orange" title="Orange Theme"></div>
+        <div class="theme-btn" style="background:#eab308" data-theme="yellow" title="Yellow Theme"></div>
+      </div>
 
-        <!-- Main Notepad Area -->
-        <textarea id="note-area" class="w-full h-full text-base font-sans p-8 rounded-lg"></textarea>
+      <h4>Font</h4>
+      <button class="small" onclick="setFont('sans-serif')">Sans-serif</button>
+      <button class="small" onclick="setFont('serif')">Serif</button>
+      <button class="small" onclick="setFont('monospace')">Monospace</button>
 
-        <!-- Control Panel -->
-        <div id="controls" class="hidden">
-            <!-- Toggle Button -->
-            <div id="toggle-controls" class="control-button">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-            </div>
-            <!-- Font Size Buttons -->
-            <div id="increase-font" class="control-button text-size-btn">+</div>
-            <div id="decrease-font" class="control-button text-size-btn">-</div>
-            <!-- Export Options -->
-            <div id="export-options" class="flex flex-col gap-2">
-                <span class="text-xs text-gray-500 font-semibold text-center">Export</span>
-                <button id="export-txt" class="export-option">.txt</button>
-                <button id="export-html" class="export-option">.html</button>
-                <button id="export-pdf" class="export-option">.pdf</button>
-                <button id="export-word" class="export-option">.doc</button>
-                <p id="word-export-text">Saves as HTML that Word can open.</p>
-            </div>
-            <!-- Note Actions -->
-            <div id="note-actions" class="flex flex-col gap-2">
-                <span class="text-xs text-gray-500 font-semibold text-center">Actions</span>
-                <button id="clear-note" class="note-action">Clear Note</button>
-            </div>
-        </div>
+      <h4>Font Size</h4>
+      <button class="small" onclick="changeSize(-2)">A−</button>
+      <button class="small" onclick="changeSize(2)">A+</button>
 
-        <!-- Hidden Preferences Panel -->
-        <div id="preferences" class="hidden-options hidden">
-            <span class="text-sm font-semibold text-gray-700 mb-2 text-center">Font</span>
-            <select id="font-select" class="font-selector">
-                <option value="Sans-serif">Sans-serif</option>
-                <option value="Serif">Serif</option>
-                <option value="Monospace">Monospace</option>
-            </select>
-            <div class="mt-4 flex flex-col items-center">
-                <span class="text-sm font-semibold text-gray-700">Font Size</span>
-                <span id="font-size-display" class="text-xl font-bold text-gray-900 mt-2">16px</span>
-            </div>
-        </div>
+      <h4>Save & Export</h4>
+      <button class="small" onclick="saveNote()">Save Now</button>
+      <button class="small" onclick="exportFile('txt')">Export TXT</button>
+      <button class="small" onclick="exportFile('html')">Export HTML</button>
+      <button class="small" onclick="exportFile('pdf')">Export PDF</button>
+      <button class="small" onclick="exportFile('doc')">Export Word</button>
 
+      <h4>Other</h4>
+      <button class="small" onclick="clearNote()">Clear Note</button>
     </div>
+  </header>
+  <textarea id="note" placeholder="Start typing..."></textarea>
 
-    <!-- JavaScript for Logic -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script>
-        // --- DOM Element References ---
-        const noteArea = document.getElementById('note-area');
-        const mainHeader = document.getElementById('main-header');
-        const colorPicker = document.getElementById('color-picker');
-        const controlsPanel = document.getElementById('controls');
-        const toggleControlsBtn = document.getElementById('toggle-controls');
-        const preferencesPanel = document.getElementById('preferences');
-        const fontSelect = document.getElementById('font-select');
-        const increaseFontBtn = document.getElementById('increase-font');
-        const decreaseFontBtn = document.getElementById('decrease-font');
-        const fontSizeDisplay = document.getElementById('font-size-display');
-        const exportTxtBtn = document.getElementById('export-txt');
-        const exportHtmlBtn = document.getElementById('export-html');
-        const exportPdfBtn = document.getElementById('export-pdf');
-        const exportWordBtn = document.getElementById('export-word');
-        const clearNoteBtn = document.getElementById('clear-note');
+<script>
+const LS = { note:"np-note", theme:"np-theme", font:"np-font", size:"np-size" };
+const note = document.getElementById("note");
+const menu = document.getElementById("menu");
+const menuBtn = document.getElementById("menuBtn");
+const title = document.getElementById("title");
 
-        // --- Core Application State & Constants ---
-        const LOCAL_STORAGE_KEY_NOTE = 'simplenotepad.note';
-        const LOCAL_STORAGE_KEY_COLOR = 'simplenotepad.color';
-        const LOCAL_STORAGE_KEY_FONT = 'simplenotepad.font';
-        const LOCAL_STORAGE_KEY_FONT_SIZE = 'simplenotepad.fontSize';
-        const DEFAULT_COLOR = '#4A90E2';
-        const DEFAULT_FONT = 'Sans-serif';
-        const DEFAULT_FONT_SIZE = 16;
-        let currentFontSize = DEFAULT_FONT_SIZE;
-        let isPreferencesVisible = false;
+const themes = {
+  white:{header:"#333",note:"#fff",noteFg:"#000"},
+  dark:{header:"#111",note:"#222",noteFg:"#fff"},
+  blue:{header:"#1e3a8a",note:"#dbeafe"},
+  green:{header:"#065f46",note:"#d1fae5"},
+  purple:{header:"#6b21a8",note:"#ede9fe"},
+  pink:{header:"#9d174d",note:"#fce7f3"},
+  orange:{header:"#ea580c",note:"#ffedd5"},
+  yellow:{header:"#ca8a04",note:"#fef9c3"},
+};
 
-        // --- Utility Functions ---
+function contrast(hex){
+  const c=parseInt(hex.replace("#",""),16);
+  const r=(c>>16)&255, g=(c>>8)&255, b=c&255;
+  return (r*0.299+g*0.587+b*0.114)>186?"#000":"#fff";
+}
 
-        /**
-         * Calculates the perceived luminance of a color and returns a contrasting text color (black or white).
-         * @param {string} hexColor - The color in hex format (e.g., '#4A90E2').
-         * @returns {string} 'black' or 'white'.
-         */
-        function getContrastColor(hexColor) {
-            const hex = hexColor.replace('#', '');
-            const r = parseInt(hex.substring(0, 2), 16);
-            const g = parseInt(hex.substring(2, 4), 16);
-            const b = parseInt(hex.substring(4, 6), 16);
-            // Calculate luminance using the W3C formula
-            const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-            return luminance > 0.5 ? 'black' : 'white';
-        }
+function setTheme(name){
+  const t=themes[name]; if(!t) return;
+  document.documentElement.style.setProperty("--header-bg",t.header);
+  document.documentElement.style.setProperty("--note-bg",t.note);
+  document.documentElement.style.setProperty("--note-fg",t.noteFg||contrast(t.note));
+  document.documentElement.style.setProperty("--header-fg",contrast(t.header));
+  if(name==="dark"){ title.style.color="#fff"; } else { title.style.color=""; }
+  localStorage.setItem(LS.theme,name);
+  document.querySelectorAll(".theme-btn").forEach(btn=>{
+    btn.classList.toggle("active",btn.dataset.theme===name);
+  });
+  menu.classList.remove("show");
+}
 
-        /**
-         * Triggers a file download using a Blob.
-         * @param {string} filename - The name of the file.
-         * @param {string} content - The file content.
-         * @param {string} mimeType - The MIME type of the content.
-         */
-        function downloadFile(filename, content, mimeType) {
-            const blob = new Blob([content], { type: mimeType });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        }
+function setFont(f){ 
+  document.documentElement.style.setProperty("--note-font",f);
+  localStorage.setItem(LS.font,f);
+  menu.classList.remove("show");
+}
+function changeSize(d){
+  let s=parseInt(getComputedStyle(note).fontSize);
+  s=Math.max(10,s+d);
+  document.documentElement.style.setProperty("--note-size",s+"px");
+  localStorage.setItem(LS.size,s);
+}
+function saveNote(){ localStorage.setItem(LS.note,note.value); alert("Note saved!"); }
+function exportFile(type){
+  let content=note.value, blob, ext, mime;
+  if(type==="txt"){blob=new Blob([content],{type:"text/plain"}); ext="txt";}
+  else if(type==="html"){blob=new Blob([`<pre>${content}</pre>`],{type:"text/html"}); ext="html";}
+  else if(type==="pdf"){window.print(); return;}
+  else if(type==="doc"){blob=new Blob([content],{type:"application/msword"}); ext="doc";}
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="note."+ext;
+  a.click();
+}
+function clearNote(){ if(confirm("Clear note?")){ note.value=""; saveNote(); } }
 
-        // --- UI Update Functions ---
-        
-        /**
-         * Updates the header's background and text color based on the selected color.
-         */
-        function updateHeaderColor() {
-            const color = colorPicker.value;
-            const contrastColor = getContrastColor(color);
-            mainHeader.style.backgroundColor = color;
-            mainHeader.style.color = contrastColor;
-            noteArea.style.color = getContrastColor(color) === 'white' ? '#f7fafc' : '#1a202c';
-        }
-        
-        /**
-         * Applies the selected font family to the note area.
-         */
-        function updateFont() {
-            noteArea.style.fontFamily = fontSelect.value;
-        }
+menuBtn.onclick=()=>menu.classList.toggle("show");
+window.onclick=e=>{ if(!menu.contains(e.target)&&e.target!==menuBtn) menu.classList.remove("show"); };
 
-        /**
-         * Updates the font size of the note area and the display text.
-         */
-        function updateFontSize() {
-            noteArea.style.fontSize = `${currentFontSize}px`;
-            fontSizeDisplay.textContent = `${currentFontSize}px`;
-        }
-
-        // --- Event Handlers ---
-
-        /**
-         * Handles note saving to local storage on input.
-         */
-        function handleNoteInput() {
-            localStorage.setItem(LOCAL_STORAGE_KEY_NOTE, noteArea.value);
-        }
-
-        /**
-         * Saves color, font, and font size preferences to local storage.
-         */
-        function savePreferences() {
-            localStorage.setItem(LOCAL_STORAGE_KEY_COLOR, colorPicker.value);
-            localStorage.setItem(LOCAL_STORAGE_KEY_FONT, fontSelect.value);
-            localStorage.setItem(LOCAL_STORAGE_KEY_FONT_SIZE, currentFontSize);
-        }
-
-        /**
-         * Loads preferences and note content from local storage.
-         */
-        function loadPreferences() {
-            const savedNote = localStorage.getItem(LOCAL_STORAGE_KEY_NOTE);
-            const savedColor = localStorage.getItem(LOCAL_STORAGE_KEY_COLOR);
-            const savedFont = localStorage.getItem(LOCAL_STORAGE_KEY_FONT);
-            const savedFontSize = localStorage.getItem(LOCAL_STORAGE_KEY_FONT_SIZE);
-
-            if (savedNote) noteArea.value = savedNote;
-            if (savedColor) colorPicker.value = savedColor;
-            if (savedFont) fontSelect.value = savedFont;
-            if (savedFontSize) currentFontSize = parseInt(savedFontSize, 10);
-
-            // Apply loaded settings
-            updateHeaderColor();
-            updateFont();
-            updateFontSize();
-        }
-
-        /**
-         * Toggles the visibility of the control panel and preferences panel.
-         */
-        function togglePanels() {
-            if (isPreferencesVisible) {
-                controlsPanel.classList.add('hidden');
-                preferencesPanel.classList.add('hidden');
-                isPreferencesVisible = false;
-            } else {
-                controlsPanel.classList.remove('hidden');
-                isPreferencesVisible = true;
-            }
-        }
-        
-        /**
-         * Toggles the visibility of the preferences panel.
-         */
-        function togglePreferences() {
-            if (preferencesPanel.classList.contains('hidden')) {
-                preferencesPanel.classList.remove('hidden');
-            } else {
-                preferencesPanel.classList.add('hidden');
-            }
-        }
-
-        // --- Export Functions ---
-
-        /**
-         * Exports the note as a plain text file.
-         */
-        function exportAsTxt() {
-            downloadFile('note.txt', noteArea.value, 'text/plain');
-        }
-
-        /**
-         * Exports the note as an HTML file.
-         */
-        function exportAsHtml() {
-            const htmlContent = `
-<!DOCTYPE html>
-<html>
-<head>
-    <title>My Note</title>
-    <style>
-        body {
-            font-family: ${fontSelect.value};
-            font-size: ${currentFontSize}px;
-            line-height: 1.6;
-            margin: 2rem;
-        }
-    </style>
-</head>
-<body>
-    <pre>${noteArea.value}</pre>
-</body>
-</html>`;
-            downloadFile('note.html', htmlContent, 'text/html');
-        }
-
-        /**
-         * Exports the note as a PDF file using jsPDF.
-         * NOTE: jsPDF is an external library loaded via CDN.
-         */
-        function exportAsPdf() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            doc.setFont(fontSelect.value === 'Serif' ? 'Times' : 'Helvetica');
-            doc.setFontSize(currentFontSize);
-            doc.text(noteArea.value, 10, 10, { maxWidth: 180 });
-            doc.save('note.pdf');
-        }
-
-        /**
-         * Exports the note content as a simple HTML file with a .doc extension.
-         * Word can open this and render it. This is a common, minimal workaround
-         * for Word export without needing complex third-party libraries.
-         */
-        function exportAsWord() {
-            const htmlContent = `
-<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-<head><title>My Note</title></head>
-<body>
-    <pre>${noteArea.value}</pre>
-</body>
-</html>`;
-            downloadFile('note.doc', htmlContent, 'application/msword');
-        }
-
-        /**
-         * Clears the note area and local storage.
-         */
-        function clearNote() {
-            noteArea.value = '';
-            localStorage.removeItem(LOCAL_STORAGE_KEY_NOTE);
-        }
-
-        // --- Keyboard Shortcuts ---
-        document.addEventListener('keydown', (e) => {
-            // Check for Ctrl (or Cmd on Mac) + key combinations
-            const isCmdOrCtrl = e.ctrlKey || e.metaKey;
-
-            if (isCmdOrCtrl) {
-                switch (e.key.toLowerCase()) {
-                    case 's':
-                        e.preventDefault();
-                        localStorage.setItem(LOCAL_STORAGE_KEY_NOTE, noteArea.value);
-                        // A simple visual confirmation
-                        const savedMsg = document.createElement('div');
-                        savedMsg.textContent = 'Note Saved!';
-                        savedMsg.style.cssText = 'position:fixed; bottom:20px; right:20px; background-color:#4A90E2; color:white; padding:10px 20px; border-radius:8px; z-index:100; opacity:0; transition:opacity 0.5s;';
-                        document.body.appendChild(savedMsg);
-                        setTimeout(() => savedMsg.style.opacity = 1, 10);
-                        setTimeout(() => savedMsg.style.opacity = 0, 1000);
-                        setTimeout(() => document.body.removeChild(savedMsg), 1500);
-                        break;
-                    case 'e':
-                        e.preventDefault();
-                        exportAsTxt(); // Default export action
-                        break;
-                    case 'p':
-                        e.preventDefault();
-                        togglePreferences();
-                        break;
-                    case '+':
-                        e.preventDefault();
-                        increaseFontSize();
-                        break;
-                    case '-':
-                        e.preventDefault();
-                        decreaseFontSize();
-                        break;
-                    default:
-                        // No-op
-                }
-            }
-        });
-
-        function increaseFontSize() {
-            currentFontSize = Math.min(currentFontSize + 2, 40);
-            updateFontSize();
-            savePreferences();
-        }
-
-        function decreaseFontSize() {
-            currentFontSize = Math.max(currentFontSize - 2, 10);
-            updateFontSize();
-            savePreferences();
-        }
-
-        // --- Event Listeners ---
-        window.addEventListener('load', () => {
-            loadPreferences();
-            togglePanels(); // Show the control panel on load
-        });
-        noteArea.addEventListener('input', handleNoteInput);
-        colorPicker.addEventListener('input', () => {
-            updateHeaderColor();
-            savePreferences();
-        });
-        toggleControlsBtn.addEventListener('click', togglePreferences); // Change the button to open/close preferences directly
-        fontSelect.addEventListener('change', () => {
-            updateFont();
-            savePreferences();
-        });
-        increaseFontBtn.addEventListener('click', increaseFontSize);
-        decreaseFontBtn.addEventListener('click', decreaseFontSize);
-        exportTxtBtn.addEventListener('click', exportAsTxt);
-        exportHtmlBtn.addEventListener('click', exportAsHtml);
-        exportPdfBtn.addEventListener('click', exportAsPdf);
-        exportWordBtn.addEventListener('click', exportAsWord);
-        clearNoteBtn.addEventListener('click', clearNote);
-
-    </script>
+note.value=localStorage.getItem(LS.note)||"";
+note.oninput=()=>localStorage.setItem(LS.note,note.value);
+setFont(localStorage.getItem(LS.font)||"sans-serif");
+document.documentElement.style.setProperty("--note-size",(localStorage.getItem(LS.size)||16)+"px");
+setTheme(localStorage.getItem(LS.theme)||"white");
+</script>
 </body>
 </html>
-</pre>
-        </body>
-    </html>
